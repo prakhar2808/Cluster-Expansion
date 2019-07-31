@@ -40,9 +40,9 @@ class Parser:
                 while not " DATA " in lines[i]:
                     i += 1
                 total_energy = list(map(float,re.findall("[+-]?\d+(?:\.\d+)?", lines[i+2])))[1]
-                # Generating a structure object with above properties
+                # Generating a structure parameters list
                 structure_parameters = [name, lattice_type, [a,b,c], source_positions, total_energy]
-                #Adding the structure in structure_list
+                #Adding the structure_parameters in structures_parameters_list
                 structures_parameters_list.append(structure_parameters)
                 
         return structures_parameters_list
