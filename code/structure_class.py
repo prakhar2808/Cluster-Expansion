@@ -71,7 +71,7 @@ class structure:
         f.close()
         
         #Calculating correlations
-        cmd = "(cd TiV_bcc;corrdump -s='str.in' -2="+max_distance+" -3="+max_distance+" -4="+max_distance+" > tmp.txt)"
+        cmd = "(cd TiV_"+self.lattice_type_+";corrdump -s='str.in' -2="+max_distance+" -3="+max_distance+" -4="+max_distance+" > tmp.txt)"
         os.system(cmd)
         
         f = open('TiV_'+self.lattice_type_+'/tmp.txt','r')
