@@ -2,6 +2,7 @@ from structure_helper_class import structure_helper
 
 import numpy as np
 from sklearn.linear_model import Lasso
+from sklearn.linear_model import LinearRegression
 
 class model_train:
     
@@ -54,9 +55,24 @@ class model_train:
         lasso.fit(self.X_training_data_, self.Y_training_data_)
         train_score=lasso.score(self.X_training_data_, self.Y_training_data_)
         test_score=lasso.score(self.X_testing_data_, self.Y_testing_data_)
-        print(train_score, test_score)
-        print(lasso.coef_)
-        print(self.Y_training_data_)
-        print(lasso.predict(self.X_training_data_))
+        print("Lasso train score =",train_score)
+        print("Lasso test score =",test_score)
+        print("Lasso coeff =",lasso.coef_)
+#        print("For training data:\nActual\tPredicted")
+#        print(np.c_[self.Y_training_data_, lasso.predict(self.X_training_data_)])
+#        print("For testing data:\nActual\tPredicted")
+#        print(np.c_[self.Y_testing_data_, lasso.predict(self.X_testing_data_)])
+        
+        lr = LinearRegression()
+        lr.fit(self.X_training_data_, self.Y_training_data_)
+        lr_train_score=lr.score(self.X_training_data_, self.Y_training_data_)
+        lr_test_score=lr.score(self.X_testing_data_, self.Y_testing_data_)
+        print("LR train score =",lr_train_score)
+        print("LR test score =",lr_test_score)
+        print("LR coeff =", lr.coef_)
+#        print("For training data:\nActual\tPredicted")
+#        print(np.c_[self.Y_training_data_, lr.predict(self.X_training_data_)])
+#        print("For testing data:\nActual\tPredicted")
+#        print(np.c_[self.Y_testing_data_, lr.predict(self.X_testing_data_)])
         return lasso.coef_
         
