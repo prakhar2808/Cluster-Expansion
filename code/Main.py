@@ -3,12 +3,9 @@ from structure_class import structure
 from model_train_class import model_train
 
 def main():
-#    lattice_type = str(input("Enter lattice type : "))
-#    file_name = str(input("Enter file name as <filename.txt> : "))
-#    max_distance = float(input("Enter max. points distance : "))
-    lattice_type = 'bcc'
-    file_name = 'Ti_V.txt'
-    max_distance = 3.2964
+    lattice_type = str(input("Enter lattice type : "))
+    file_name = str(input("Enter file name as <filename.txt> : "))
+    max_distance = float(input("Enter max. points distance : "))
     
     #Parsing the above entered file to get the list of parameters for all structures.
     structures_parameters_list = Parser.parse(lattice_type, file_name)
