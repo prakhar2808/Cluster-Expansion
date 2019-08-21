@@ -10,6 +10,7 @@ class structure_helper:
     def get_composition_ratio(structure_object, all_elements):
         x = 0.0
         y = 0.0
+        #TODO : Generalize for more than binary.
         if all_elements[0] in structure_object.source_positions_:
             x = len(structure_object.source_positions_[all_elements[0]])
         if all_elements[1] in structure_object.source_positions_:

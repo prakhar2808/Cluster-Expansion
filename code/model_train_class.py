@@ -1,4 +1,5 @@
 from structure_helper_class import structure_helper
+from matrix_inversion_class import matrix_inversion
 
 import numpy as np
 from sklearn.linear_model import Lasso
@@ -10,9 +11,9 @@ class model_train:
     def __init__(self, structure_name_to_object_map):
         self.training_dataset_structures_list_ = self.generate_structures_for_training_data(structure_name_to_object_map)
         self.testing_dataset_structures_list_ = self.generate_structures_for_testing_data(structure_name_to_object_map)
-        self.X_training_data_, self.Y_training_data_ = self.generate_training_data_vectors('train')
-        self.X_testing_data_, self.Y_testing_data_ = self.generate_training_data_vectors('test')
-        self.thetas_ = self.get_thetas()
+        self.X_training_data_, self.Y_training_data_ = self.generate_data_vectors('train')
+        self.X_testing_data_, self.Y_testing_data_ = self.generate_data_vectors('test')
+        self.thetas_ = self.get_thetas(structure_name_to_object_map)
     
     #Generates a list of structures for training.
     def generate_structures_for_training_data(self, structure_name_to_object_map):
@@ -36,11 +37,14 @@ class model_train:
         return testing_dataset_structures_list
     
     #Generate training data vectors
-    def generate_training_data_vectors(self, type_dataset):
+    def generate_data_vectors(self, type_dataset):
         X_list = []
         Y_list = []
         if type_dataset == 'train':
             dataset_structures_list = self.training_dataset_structures_list_
+            for struct in dataset_structures_list:
+                print('\nUsed struct :')
+                struct.print(True)
         else:
             dataset_structures_list = self.testing_dataset_structures_list_
         for structure_object in dataset_structures_list:
@@ -50,19 +54,22 @@ class model_train:
             Y_list.append([structure_object.total_energy_])
         return np.array(X_list), np.array(Y_list)
     
-    def get_thetas(self):
+    def get_thetas(self, structure_name_to_object_map):
+        
+        #Using Lasso
         lasso = Lasso()
         lasso.fit(self.X_training_data_, self.Y_training_data_)
         train_score=lasso.score(self.X_training_data_, self.Y_training_data_)
         test_score=lasso.score(self.X_testing_data_, self.Y_testing_data_)
         print("Lasso train score =",train_score)
-        print("Lasso test score =",test_score)
+        print("Lasso test score =", test_score)
         print("Lasso coeff =",lasso.coef_)
 #        print("For training data:\nActual\tPredicted")
 #        print(np.c_[self.Y_training_data_, lasso.predict(self.X_training_data_)])
 #        print("For testing data:\nActual\tPredicted")
 #        print(np.c_[self.Y_testing_data_, lasso.predict(self.X_testing_data_)])
         
+        #Using LR
         lr = LinearRegression()
         lr.fit(self.X_training_data_, self.Y_training_data_)
         lr_train_score=lr.score(self.X_training_data_, self.Y_training_data_)
@@ -70,9 +77,14 @@ class model_train:
         print("LR train score =",lr_train_score)
         print("LR test score =",lr_test_score)
         print("LR coeff =", lr.coef_)
-#        print("For training data:\nActual\tPredicted")
-#        print(np.c_[self.Y_training_data_, lr.predict(self.X_training_data_)])
-#        print("For testing data:\nActual\tPredicted")
-#        print(np.c_[self.Y_testing_data_, lr.predict(self.X_testing_data_)])
+        print("For training data:\nActual\tPredicted")
+        print(np.c_[self.Y_training_data_, lr.predict(self.X_training_data_)])
+        print("For testing data:\nActual\tPredicted")
+        print(np.c_[self.Y_testing_data_, lr.predict(self.X_testing_data_)])
+        
+        #Matrix inversion
+        matrix_inversion_object = matrix_inversion(structure_name_to_object_map)
+        matrix_predictions = matrix_inversion_object.predict(self.X_testing_data_)
+        print(np.c_[self.Y_testing_data_, np.vstack(np.array(matrix_predictions))])
         return lasso.coef_
         
