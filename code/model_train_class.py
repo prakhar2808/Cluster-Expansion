@@ -2,6 +2,7 @@ from structure_helper_class import structure_helper
 from matrix_inversion_class import matrix_inversion
 
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import LinearRegression
 
@@ -13,7 +14,9 @@ class model_train:
         self.testing_dataset_structures_list_ = self.generate_structures_for_testing_data(structure_name_to_object_map)
         self.X_training_data_, self.Y_training_data_ = self.generate_data_vectors('train')
         self.X_testing_data_, self.Y_testing_data_ = self.generate_data_vectors('test')
-        self.thetas_ = self.get_thetas(structure_name_to_object_map)
+        self.lasso_object = self.get_lasso_object(structure_name_to_object_map)
+        self.lr_object_ = self.get_lr_object(structure_name_to_object_map)
+        self.matinv_object_ = self.get_matinv_object(structure_name_to_object_map)
     
     #Generates a list of structures for training.
     def generate_structures_for_training_data(self, structure_name_to_object_map):
@@ -36,7 +39,7 @@ class model_train:
                 testing_dataset_structures_list.append(structure_object)
         return testing_dataset_structures_list
     
-    #Generate training data vectors
+    #Generate data vectors
     def generate_data_vectors(self, type_dataset):
         X_list = []
         Y_list = []
@@ -54,37 +57,49 @@ class model_train:
             Y_list.append([structure_object.total_energy_])
         return np.array(X_list), np.array(Y_list)
     
-    def get_thetas(self, structure_name_to_object_map):
-        
-        #Using Lasso
-        lasso = Lasso()
-        lasso.fit(self.X_training_data_, self.Y_training_data_)
-        train_score=lasso.score(self.X_training_data_, self.Y_training_data_)
-        test_score=lasso.score(self.X_testing_data_, self.Y_testing_data_)
-        print("Lasso train score =",train_score)
-        print("Lasso test score =", test_score)
-        print("Lasso coeff =",lasso.coef_)
-#        print("For training data:\nActual\tPredicted")
-#        print(np.c_[self.Y_training_data_, lasso.predict(self.X_training_data_)])
-#        print("For testing data:\nActual\tPredicted")
-#        print(np.c_[self.Y_testing_data_, lasso.predict(self.X_testing_data_)])
-        
-        #Using LR
+    def get_lasso_object(self, structure_name_to_object_map):
+        print('--------------------------------------------------------------')
+        print('Lasso :')
+        alphas = [0.0001, 0.0003, 0.0007, 0.001, 0.003, 0.007, 0.01, 0.03, 0.07]
+        lasso_list = []
+        for alpha_ in alphas:
+            lasso = Lasso(alpha=alpha_)
+            lasso.fit(self.X_training_data_, self.Y_training_data_)
+            train_score=lasso.score(self.X_training_data_, self.Y_training_data_)
+            lasso_list.append((train_score, lasso))
+        lasso_list.sort(key = lambda x: x[0], reverse = True)
+        lasso_best = lasso_list[0][1]
+        test_score=lasso_best.score(self.X_testing_data_, self.Y_testing_data_)
+        print("\nLasso test score =", test_score)
+        print("\nFor training data:\n")
+        results = pd.DataFrame({'Actual':self.Y_training_data_[:,0], 'Predicted':lasso_best.predict(self.X_training_data_)[:]})
+        print(results)
+        print("\nFor testing data:\n")
+        results = pd.DataFrame({'Actual':self.Y_testing_data_[:,0], 'Predicted':lasso_best.predict(self.X_testing_data_)[:]})
+        print(results)
+        print("\nCECs =\n", lasso_best.coef_.reshape(6,1))
+        return lasso_best
+    
+    def get_lr_object(self, structure_name_to_object_map):
+        print('--------------------------------------------------------------')
+        print('Linear Regression :')
         lr = LinearRegression()
         lr.fit(self.X_training_data_, self.Y_training_data_)
-        lr_train_score=lr.score(self.X_training_data_, self.Y_training_data_)
         lr_test_score=lr.score(self.X_testing_data_, self.Y_testing_data_)
-        print("LR train score =",lr_train_score)
-        print("LR test score =",lr_test_score)
-        print("LR coeff =", lr.coef_)
-        print("For training data:\nActual\tPredicted")
-        print(np.c_[self.Y_training_data_, lr.predict(self.X_training_data_)])
-        print("For testing data:\nActual\tPredicted")
-        print(np.c_[self.Y_testing_data_, lr.predict(self.X_testing_data_)])
+        print("\nLR test score =",lr_test_score)
+        print("\nFor training data:\n")
+        results = pd.DataFrame({'Actual':self.Y_training_data_[:,0], 'Predicted':lr.predict(self.X_training_data_)[:,0]})
+        print(results)
+        print("\nFor testing data:\n")
+        results = pd.DataFrame({'Actual':self.Y_testing_data_[:,0], 'Predicted':lr.predict(self.X_testing_data_)[:,0]})
+        print(results)
+        print("\nCECs =\n", lr.coef_.reshape(6,1))
+        return lr
         
-        #Matrix inversion
-        matrix_inversion_object = matrix_inversion(structure_name_to_object_map)
-        matrix_predictions = matrix_inversion_object.predict(self.X_testing_data_)
-        print(np.c_[self.Y_testing_data_, np.vstack(np.array(matrix_predictions))])
-        return lasso.coef_
+    def get_matinv_object(self, structure_name_to_object_map):
+        print('--------------------------------------------------------------')
+        print('Matrix Inversion :')
+        matrix_inversion_object = matrix_inversion(structure_name_to_object_map,self.X_testing_data_,self.Y_testing_data_)
+        print('\nCECs = \n', matrix_inversion_object.CEC_best_)
+        return matrix_inversion_object
         
