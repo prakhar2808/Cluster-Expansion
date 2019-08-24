@@ -1,5 +1,6 @@
 from structure_helper_class import structure_helper
 from matrix_inversion_class import matrix_inversion
+from matrix_inversion_class_alternate import matrix_inversion_alternate
 
 import numpy as np
 import pandas as pd
@@ -14,12 +15,12 @@ class model_train:
         self.testing_dataset_structures_list_ = self.generate_structures_for_testing_data(structure_name_to_object_map)
         self.X_training_data_, self.Y_training_data_ = self.generate_data_vectors('train')
         self.X_testing_data_, self.Y_testing_data_ = self.generate_data_vectors('test')
-        self.lasso_object = self.get_lasso_object(structure_name_to_object_map)
+        self.lasso_object_ = self.get_lasso_object(structure_name_to_object_map)
         self.lr_object_ = self.get_lr_object(structure_name_to_object_map)
         self.matinv_object_ = self.get_matinv_object(structure_name_to_object_map)
     
     #Generates a list of structures for training.
-    def generate_structures_for_training_data(self, structure_name_to_object_map):
+    def generate_structures_for_training_data(self, structure_name_to_object_map, display_training_structs = False):
         #Getting compositions
         composition_ratio_to_structure_names_list_map = structure_helper.get_composition_ratio_to_structure_names_list_map(structure_name_to_object_map.values())
         #Generating structures for training data
@@ -29,6 +30,12 @@ class model_train:
             for structure_name in structures_names_list:
                 structures_list.append(structure_name_to_object_map[structure_name])
             training_dataset_structures_list.append(structure_helper.get_min_energy_structure(structures_list))
+        
+        if display_training_structs:
+            for struct in training_dataset_structures_list:
+                print('\nUsed struct :')
+                struct.print(True)
+                
         return training_dataset_structures_list
     
     #Generates a list of structures for testing.
@@ -45,9 +52,6 @@ class model_train:
         Y_list = []
         if type_dataset == 'train':
             dataset_structures_list = self.training_dataset_structures_list_
-            for struct in dataset_structures_list:
-                print('\nUsed struct :')
-                struct.print(True)
         else:
             dataset_structures_list = self.testing_dataset_structures_list_
         for structure_object in dataset_structures_list:
@@ -98,8 +102,12 @@ class model_train:
         
     def get_matinv_object(self, structure_name_to_object_map):
         print('--------------------------------------------------------------')
-        print('Matrix Inversion :')
+        print('Matrix Inversion:')
         matrix_inversion_object = matrix_inversion(structure_name_to_object_map,self.X_testing_data_,self.Y_testing_data_)
         print('\nCECs = \n', matrix_inversion_object.CEC_best_)
+        print('--------------------------------------------------------------')
+        print('Matrix Inversion Alternate:')
+        matrix_inversion_object = matrix_inversion_alternate(structure_name_to_object_map,self.X_testing_data_,self.Y_testing_data_)
+        print('\nCECs = \n', matrix_inversion_object.CEC_)
         return matrix_inversion_object
         

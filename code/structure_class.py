@@ -9,7 +9,7 @@ def myround(x, prec=2, base=.5):
 class structure:
     
     #Constructor
-    def __init__(self, parameters, max_distance):
+    def __init__(self, parameters, max_distance, elements):
         self.name_ = parameters[0]
         self.lattice_type_ = parameters[1]
         self.translation_vectors_ = parameters[2]
@@ -18,7 +18,7 @@ class structure:
             self.source_positions_[atom] = []
             for pos in pos_list:
                 self.source_positions_[atom].append(myround(pos))
-        self.clusters_list_ = self.generate_clusters(max_distance)
+        self.clusters_list_ = self.generate_clusters(max_distance, elements)
         self.total_energy_ = parameters[4]
         
     #Printing method
@@ -46,19 +46,19 @@ class structure:
         print("--------------------------------------------------------------")
         
     #Clusters generator
-    def generate_clusters(self, max_distance):
+    def generate_clusters(self, max_distance, elements):
         # Generating directory and lat.in file
-        cmd = 'makelat Ti,V '+ self.lattice_type_
+        cmd = 'makelat '+elements[0]+','+elements[1] +' '+ self.lattice_type_
         os.system(cmd)
         
-        f = open('TiV_'+self.lattice_type_+'/lat.in','r')
+        f = open(elements[0]+elements[1]+'_'+self.lattice_type_+'/lat.in','r')
         lines = f.readlines()
         f.close()
         
         retval = []
         
         #Generating str.in file
-        f = open('TiV_'+self.lattice_type_+'/str.in','w')
+        f = open(elements[0]+elements[1]+'_'+self.lattice_type_+'/str.in','w')
         for i in range(3):
             f.write(lines[i])
             
@@ -71,14 +71,14 @@ class structure:
         f.close()
         
         #Calculating correlations
-        cmd = "(cd TiV_"+self.lattice_type_+";corrdump -s='str.in' -2="+max_distance+" -3="+max_distance+" -4="+max_distance+" > tmp.txt)"
+        cmd = "(cd "+elements[0]+elements[1]+'_'+self.lattice_type_+";corrdump -s='str.in' -2="+max_distance+" -3="+max_distance+" -4="+max_distance+" > tmp.txt)"
         os.system(cmd)
         
-        f = open('TiV_'+self.lattice_type_+'/tmp.txt','r')
+        f = open(elements[0]+elements[1]+'_'+self.lattice_type_+'/tmp.txt','r')
         correlations_list = list(map(float, f.readlines()[0].split()))
         f.close()
         
-        f = open('TiV_'+self.lattice_type_+'/clusters.out','r')
+        f = open(elements[0]+elements[1]+'_'+self.lattice_type_+'/clusters.out','r')
         clusters_read = ['']
         for line in f.readlines():
             clusters_read.append(line.strip())
@@ -105,7 +105,7 @@ class structure:
         f.close()
         
         # Removing the directory 
-        cmd = 'rm -r TiV_'+self.lattice_type_
+        cmd = 'rm -r '+elements[0]+elements[1]+'_'+self.lattice_type_
         os.system(cmd)
         
         return retval

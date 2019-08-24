@@ -70,7 +70,7 @@ class matrix_inversion:
                     print(inv_matrix)
                 X_inverted_matrices_list.append(inv_matrix)
             except:
-                print('\n Warning : Found a singular matrix. Not inverting it\n', matrix)
+                print('\n Warning : Found a singular matrix. Failed inverting. Skipping.\n', matrix)
         return X_inverted_matrices_list
     
     def generate_CEC_list(self, display_CECs = False):
@@ -91,6 +91,7 @@ class matrix_inversion:
             predictions_list.append(predictions)
             score = r2_score(Y_testing_data, np.array(predictions).reshape(np.shape(Y_testing_data)), sample_weight=None, multioutput='variance_weighted')
             test_score_to_CEC_index_map_[score] = index
+            print(score)
         max_score = max(test_score_to_CEC_index_map_.keys())
         if print_results:
             predictions = (np.array(predictions_list[test_score_to_CEC_index_map_[max_score]])).reshape(np.shape(Y_testing_data))

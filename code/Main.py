@@ -7,8 +7,12 @@ def main():
 #    file_name = str(input("Enter file name as <filename.txt> : "))
 #    max_distance = float(input("Enter max. points distance : "))
     lattice_type = 'bcc'
-    file_name = 'Ti_V.txt'
+    elements = ['Ti', 'V']
+#    elements = ['Sc', 'Ti']
+    file_name = elements[0]+'_'+elements[1]+'.txt'
     max_distance = 3.4
+#    max_distance = 3.879794
+    
     
     #Parsing the above entered file to get the list of parameters for all structures.
     structures_parameters_list = Parser.parse(lattice_type, file_name)
@@ -17,7 +21,7 @@ def main():
     structure_name_to_object_map = {}
     #Getting the list of all the structure objects.
     for parameters in structures_parameters_list:
-        structure_object = structure(parameters, str(max_distance))
+        structure_object = structure(parameters, str(max_distance), elements)
         structure_name_to_object_map[structure_object.name_] = structure_object
         
     #Printing the structures
