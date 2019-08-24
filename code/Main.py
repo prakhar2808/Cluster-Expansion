@@ -1,6 +1,8 @@
 from parser_class import Parser
 from structure_class import structure
 from model_train_class import model_train
+from ConvexHull import convex_hull
+
 
 def main():
 #    lattice_type = str(input("Enter lattice type : "))
@@ -8,10 +10,10 @@ def main():
 #    max_distance = float(input("Enter max. points distance : "))
     lattice_type = 'bcc'
     elements = ['Ti', 'V']
+#    max_distance = 3.4
 #    elements = ['Sc', 'Ti']
+    max_distance = 3.879794
     file_name = elements[0]+'_'+elements[1]+'.txt'
-    max_distance = 3.4
-#    max_distance = 3.879794
     
     
     #Parsing the above entered file to get the list of parameters for all structures.
@@ -24,6 +26,9 @@ def main():
         structure_object = structure(parameters, str(max_distance), elements)
         structure_name_to_object_map[structure_object.name_] = structure_object
         
+    #Drawing convex hull for all the structures.
+    convex_hull.draw(structure_name_to_object_map)
+    
     #Printing the structures
 #    for structure_object in structure_name_to_object_map.values():
 #        structure_object.print()
