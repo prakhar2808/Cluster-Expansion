@@ -62,12 +62,9 @@ class matrix_inversion_alternate:
 
     def predict(self, X_testing_data, Y_testing_data, print_results = False):
         predictions = []
-        print(np.shape(self.CEC_))
-        print(np.shape(X_testing_data[0]))
         for row in X_testing_data:
             predictions.append(np.matmul(row[1:].reshape(1,5), self.CEC_))
         score = r2_score(Y_testing_data, np.array(predictions).reshape(np.shape(Y_testing_data)), sample_weight=None, multioutput='variance_weighted')
-        print(score)
         if print_results:
             predictions = (np.array(predictions)).reshape(np.shape(Y_testing_data))
             print('\nMatrix Inversion test score = ', score)
