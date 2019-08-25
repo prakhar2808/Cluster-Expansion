@@ -26,7 +26,10 @@ class Parser:
                 while not " Structure POST " in lines[i]:
                     pos = list(map(float,re.findall("[+-]?\d+(?:\.\d+)?", lines[i])[1:]))
                     element = lines[i].split()[-1]
-                    element = element[0:element.find("_")]
+                    if element.find("_") is not -1:
+                        element = element[0:element.find("_")]
+                    if element.find("+") is not -1:
+                        element = element[0:element.find("+")]
                     x = [i * pos[0] for i in a] 
                     y = [i * pos[1] for i in b] 
                     z = [i * pos[2] for i in c]

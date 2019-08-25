@@ -14,18 +14,25 @@ def main():
     max_distance = 3.4
 #    elements = ['Sc', 'Ti']
 #    max_distance = 3.879794
+#    elements = ['Cr', 'Ti']
+#    max_distance = 3.394820
+#    elements = ['Sc', 'V']
+#    max_distance = 3.879794
     file_name = elements[0]+'_'+elements[1]+'.txt'
     
     
     #Parsing the above entered file to get the list of parameters for all structures.
     structures_parameters_list = Parser.parse(lattice_type, file_name)
-    
+        
     #Storing map from structure name to structure object for easier access.
     structure_name_to_object_map = {}
     #Getting the list of all the structure objects.
     for parameters in structures_parameters_list:
-        structure_object = structure(parameters, str(max_distance), elements)
-        structure_name_to_object_map[structure_object.name_] = structure_object
+        try:
+            structure_object = structure(parameters, str(max_distance), elements)
+            structure_name_to_object_map[structure_object.name_] = structure_object
+        except:
+            continue                
         
     #Drawing convex hull for all the structures.
     convex_hull.draw(structure_name_to_object_map)
@@ -41,6 +48,9 @@ def main():
     
     model_train_helper.verify_predictions(structure_name_to_object_map, 
                                           model_train_object.lr_object_, 'LR')
+    
+    model_train_helper.verify_predictions(structure_name_to_object_map, 
+                                          model_train_object.matinv_object_, 'Matrix Inversion')
     
 # Calling main function
 if __name__ == "__main__":

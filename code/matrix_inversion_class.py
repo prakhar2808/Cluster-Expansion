@@ -3,6 +3,7 @@ from structure_helper_class import structure_helper
 import numpy as np
 import pandas as pd
 from sklearn.metrics import r2_score
+from tabulate import tabulate
 
 class matrix_inversion:
     
@@ -97,5 +98,11 @@ class matrix_inversion:
             print('\nMatrix Inversion test score = ', max_score)
             results = pd.DataFrame({'Actual':Y_testing_data[:,0], 'Predicted':predictions[:,0]})
             print('\nFor testing data:\n')
-            print(results)
+            print(tabulate(results, headers='keys', tablefmt='psql'))
         return self.CEC_list_[test_score_to_CEC_index_map_[max_score]]
+    
+    def predict(self, X_input):
+        predictions = []
+        for row in X_input:
+            predictions.append(np.matmul(row.reshape(1,6), self.CEC_best_))
+        return np.array(predictions)

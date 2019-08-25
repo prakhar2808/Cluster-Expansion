@@ -1,11 +1,11 @@
 from structure_helper_class import structure_helper
 from matrix_inversion_class import matrix_inversion
-from matrix_inversion_class_alternate import matrix_inversion_alternate
 
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import LinearRegression
+from tabulate import tabulate
 
 class model_train:
     
@@ -67,7 +67,7 @@ class model_train:
         alphas = [0.0001, 0.0003, 0.0007, 0.001, 0.003, 0.007, 0.01, 0.03, 0.07]
         lasso_list = []
         for alpha_ in alphas:
-            lasso = Lasso(alpha=alpha_)
+            lasso = Lasso(alpha=alpha_, fit_intercept=True)
             lasso.fit(self.X_training_data_, self.Y_training_data_)
             train_score=lasso.score(self.X_training_data_, self.Y_training_data_)
             lasso_list.append((train_score, lasso))
@@ -77,10 +77,10 @@ class model_train:
         print("\nLasso test score =", test_score)
         print("\nFor training data:\n")
         results = pd.DataFrame({'Actual':self.Y_training_data_[:,0], 'Predicted':lasso_best.predict(self.X_training_data_)[:]})
-        print(results)
+        print(tabulate(results, headers='keys', tablefmt='psql'))
         print("\nFor testing data:\n")
         results = pd.DataFrame({'Actual':self.Y_testing_data_[:,0], 'Predicted':lasso_best.predict(self.X_testing_data_)[:]})
-        print(results)
+        print(tabulate(results, headers='keys', tablefmt='psql'))
         print("\nCECs =\n", lasso_best.coef_.reshape(6,1))
         return lasso_best
     
@@ -93,10 +93,10 @@ class model_train:
         print("\nLR test score =",lr_test_score)
         print("\nFor training data:\n")
         results = pd.DataFrame({'Actual':self.Y_training_data_[:,0], 'Predicted':lr.predict(self.X_training_data_)[:,0]})
-        print(results)
+        print(tabulate(results, headers='keys', tablefmt='psql'))
         print("\nFor testing data:\n")
         results = pd.DataFrame({'Actual':self.Y_testing_data_[:,0], 'Predicted':lr.predict(self.X_testing_data_)[:,0]})
-        print(results)
+        print(tabulate(results, headers='keys', tablefmt='psql'))
         print("\nCECs =\n", lr.coef_.reshape(6,1))
         return lr
         
@@ -105,9 +105,5 @@ class model_train:
         print('Matrix Inversion:')
         matrix_inversion_object = matrix_inversion(structure_name_to_object_map,self.X_testing_data_,self.Y_testing_data_)
         print('\nCECs = \n', matrix_inversion_object.CEC_best_)
-        print('--------------------------------------------------------------')
-        print('Matrix Inversion Alternate:')
-        matrix_inversion_object = matrix_inversion_alternate(structure_name_to_object_map,self.X_testing_data_,self.Y_testing_data_)
-        print('\nCECs = \n', matrix_inversion_object.CEC_)
         return matrix_inversion_object
         
