@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import Lasso
 from sklearn.linear_model import LinearRegression
+from scipy.optimize import minimize
 from tabulate import tabulate
 
 class model_train:
@@ -62,12 +63,34 @@ class model_train:
         return np.array(X_list), np.array(Y_list)
     
     def get_lasso_object(self, structure_name_to_object_map):
+        '''
+        We will take out some of the points from testing data and include them
+        in training data. Every point in the training data will have certain 
+        weight attached to it. To integrate the weights in the loss function,
+        we will multiply all the features of a sample with the given weight
+        and also the corresponding y value.
+        '''
+        # Getting 8 random indices from testing dataset.
+        indices = np.random.randint(np.shape(self.Y_testing_data_)[0], size=8)
+        # Adding the samples to training dataset with weight = 0.65 (It will be
+        # squared while calculating loss).
+        for index in indices:
+            self.X_training_data_ = np.vstack((self.X_training_data_, 
+                                               0.65*self.X_testing_data_[index]))
+            self.Y_training_data_ = np.vstack((self.Y_training_data_, 
+                                               0.65*self.Y_testing_data_[index]))
+        # Removing from testing data
+        self.X_testing_data_ = np.delete(self.X_testing_data_, indices, 0)
+        self.Y_testing_data_ = np.delete(self.Y_testing_data_, indices, 0)
+        '''
+        Dataset is now ready.
+        '''
         print('--------------------------------------------------------------')
         print('Lasso :')
         alphas = [0.0001, 0.0003, 0.0007, 0.001, 0.003, 0.007, 0.01, 0.03, 0.07]
         lasso_list = []
         for alpha_ in alphas:
-            lasso = Lasso(alpha=alpha_, fit_intercept=True)
+            lasso = Lasso(alpha=alpha_)
             lasso.fit(self.X_training_data_, self.Y_training_data_)
             train_score=lasso.score(self.X_training_data_, self.Y_training_data_)
             lasso_list.append((train_score, lasso))
@@ -106,4 +129,6 @@ class model_train:
         matrix_inversion_object = matrix_inversion(structure_name_to_object_map,self.X_testing_data_,self.Y_testing_data_)
         print('\nCECs = \n', matrix_inversion_object.CEC_best_)
         return matrix_inversion_object
+        
+    
         

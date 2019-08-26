@@ -35,7 +35,7 @@ def main():
             continue                
         
     #Drawing convex hull for all the structures.
-    convex_hull.draw(structure_name_to_object_map)
+#    convex_hull.draw(structure_name_to_object_map)
     
     #Printing the structures
 #    for structure_object in structure_name_to_object_map.values():
@@ -45,7 +45,7 @@ def main():
     
     model_train_helper.verify_predictions(structure_name_to_object_map, 
                                           model_train_object.lasso_object_, 'Lasso')
-    
+#    
     model_train_helper.verify_predictions(structure_name_to_object_map, 
                                           model_train_object.lr_object_, 'LR')
     
