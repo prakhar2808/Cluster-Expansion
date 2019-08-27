@@ -5,6 +5,36 @@ import pandas as pd
 from tabulate import tabulate
 
 class model_train_helper:
+    
+    def get_prediction_dict(structure_name_to_object_map, model, model_str):
+        
+        composition_ratio_to_structure_names_list_map = structure_helper.get_composition_ratio_to_structure_names_list_map(structure_name_to_object_map.values())
+        prediction_dict = {}
+        for composition in sorted(composition_ratio_to_structure_names_list_map.keys()):
+            structure_names_list = composition_ratio_to_structure_names_list_map[composition]
+            
+            name_to_energy_map = {}
+            structure_objects_list = []
+            
+            for name in structure_names_list:
+                structure_objects_list.append(structure_name_to_object_map[name])
+            
+            for structure_object in structure_objects_list:
+                correlations = [x.correlation_ for x in structure_object.clusters_list_]
+                multiplicities = [x.multiplicity_ for x in structure_object.clusters_list_]
+                X = [a*b for a,b in zip(correlations, multiplicities)]
+                predicted_energy = model.predict(np.array(X).reshape(1,-1))[0]
+                if model_str == 'LR':
+                    predicted_energy = predicted_energy[0]
+                if model_str == 'Matrix Inversion':
+                    predicted_energy = predicted_energy[0][0]
+                name_to_energy_map[structure_object.name_] = predicted_energy
+            
+            prediction_dict[composition] = name_to_energy_map
+            
+        return prediction_dict
+        
+        
     # Given a model and all the structures, for each composition this function
     # predicts the total energy for every structure using the model and then
     # checks whether the structure predicted with minimum energy is same as

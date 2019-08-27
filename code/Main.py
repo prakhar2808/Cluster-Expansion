@@ -34,23 +34,25 @@ def main():
         except:
             continue                
         
-    #Drawing convex hull for all the structures.
-#    convex_hull.draw(structure_name_to_object_map)
-    
     #Printing the structures
 #    for structure_object in structure_name_to_object_map.values():
 #        structure_object.print()
         
-    model_train_object = model_train(structure_name_to_object_map) 
+    model_train_object = model_train(structure_name_to_object_map)
+    
+    convex_hull.draw(structure_name_to_object_map)
     
     model_train_helper.verify_predictions(structure_name_to_object_map, 
                                           model_train_object.lasso_object_, 'Lasso')
+    convex_hull.draw(structure_name_to_object_map, model_train_object.lasso_object_, 'Lasso')
 #    
     model_train_helper.verify_predictions(structure_name_to_object_map, 
                                           model_train_object.lr_object_, 'LR')
+    convex_hull.draw(structure_name_to_object_map, model_train_object.lr_object_, 'LR')
     
     model_train_helper.verify_predictions(structure_name_to_object_map, 
                                           model_train_object.matinv_object_, 'Matrix Inversion')
+    convex_hull.draw(structure_name_to_object_map, model_train_object.matinv_object_, 'Matrix Inversion')
     
 # Calling main function
 if __name__ == "__main__":
