@@ -30,6 +30,7 @@ class model_train:
             for structure_name in structures_names_list:
                 structures_list.append(structure_name_to_object_map[structure_name])
             training_dataset_structures_list.append(structure_helper.get_min_energy_structure(structures_list))
+#            training_dataset_structures_list.append(structure_helper.get_second_min_energy_structure(structures_list))
         
         if display_training_structs:
             for struct in training_dataset_structures_list:
@@ -75,9 +76,9 @@ class model_train:
         # squared while calculating loss).
         for index in indices:
             self.X_training_data_ = np.vstack((self.X_training_data_, 
-                                               0.65*self.X_testing_data_[index]))
+                                               0.04*self.X_testing_data_[index]))
             self.Y_training_data_ = np.vstack((self.Y_training_data_, 
-                                               0.65*self.Y_testing_data_[index]))
+                                               0.04*self.Y_testing_data_[index]))
         # Removing from testing data
         self.X_testing_data_ = np.delete(self.X_testing_data_, indices, 0)
         self.Y_testing_data_ = np.delete(self.Y_testing_data_, indices, 0)
@@ -90,8 +91,8 @@ class model_train:
         lasso_list = []
         for alpha_ in alphas:
             lasso = Lasso(alpha=alpha_)
-            lasso.fit(self.X_training_data_, self.Y_training_data_)
-            train_score=lasso.score(self.X_training_data_, self.Y_training_data_)
+            lasso.fit(self.X_testing_data_, self.Y_testing_data_)
+            train_score=lasso.score(self.X_testing_data_, self.Y_testing_data_)
             lasso_list.append((train_score, lasso))
         lasso_list.sort(key = lambda x: x[0], reverse = True)
         lasso_best = lasso_list[0][1]

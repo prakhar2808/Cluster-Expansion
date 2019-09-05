@@ -33,5 +33,9 @@ class structure_helper:
     def get_min_energy_structure(structures_list):
         structures_list.sort(key=lambda x: x.total_energy_)
         return structures_list[0]
+    
+    def get_second_min_energy_structure(structures_list):
+        structures_list.sort(key=lambda x: x.total_energy_)
+        return structures_list[1]
         
         
