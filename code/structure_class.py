@@ -1,5 +1,6 @@
 import os
 from cluster_class import cluster
+from structure_helper_class import structure_helper
 
 #Custom round function
 def myround(x, prec=2, base=.5):
@@ -9,7 +10,8 @@ def myround(x, prec=2, base=.5):
 class structure:
     
     #Constructor
-    def __init__(self, parameters, max_distance, elements):
+    def __init__(self, parameters, max_distance, elements,
+                 pure_element_0_min_energy, pure_element_1_min_energy):
         self.name_ = parameters[0]
         self.lattice_type_ = parameters[1]
         self.translation_vectors_ = parameters[2]
@@ -19,7 +21,15 @@ class structure:
             for pos in pos_list:
                 self.source_positions_[atom].append(myround(pos))
         self.clusters_list_ = self.generate_clusters(max_distance, elements)
-        self.total_energy_ = parameters[4]
+        self.actual_total_energy_ = parameters[4]
+        self.total_energy_ = self.cal_delta_energy(pure_element_0_min_energy, 
+                                              pure_element_1_min_energy, 
+                                              elements)
+#        self.total_energy_ = parameters[4]
+        
+    def cal_delta_energy(self, pure_0, pure_1, all_elements):
+        comp = structure_helper.get_composition_ratio(self, all_elements)
+        return self.actual_total_energy_ - comp*pure_1 - (1-comp)*pure_0
         
     #Printing method
     def print(self, print_clusters_info = False):

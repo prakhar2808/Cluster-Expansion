@@ -23,7 +23,7 @@ class model_train_helper:
                 correlations = [x.correlation_ for x in structure_object.clusters_list_]
                 multiplicities = [x.multiplicity_ for x in structure_object.clusters_list_]
                 X = [a*b for a,b in zip(correlations, multiplicities)]
-                predicted_energy = model.predict(np.array(X).reshape(1,-1))[0]
+                predicted_energy = model.predict(np.array(X[2:]).reshape(1,-1))[0]
                 if model_str == 'LR':
                     predicted_energy = predicted_energy[0]
                 if model_str == 'Matrix Inversion':
@@ -65,7 +65,7 @@ class model_train_helper:
                 correlations = [x.correlation_ for x in structure_object.clusters_list_]
                 multiplicities = [x.multiplicity_ for x in structure_object.clusters_list_]
                 X = [a*b for a,b in zip(correlations, multiplicities)]
-                predicted_energy = model.predict(np.array(X).reshape(1,-1))[0]
+                predicted_energy = model.predict(np.array(X[2:]).reshape(1,-1))[0]
                 prediction_dict[structure_object.name_] = predicted_energy
                 
             actual_min_structure_name = structure_helper.get_min_energy_structure(structure_objects_list).name_
